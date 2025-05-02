@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import api from "../services/api";
 
 function Users() {
   const [users, setUsers] = useState([]);
@@ -10,7 +11,8 @@ function Users() {
   // Charger tous les utilisateurs
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/users");
+      const token = localStorage.getItem('token')
+      const response = await axios.get("http://localhost:5000/api/users",{ headers:{Authorization:`Bearer ${token}`}});
       console.log(response);
       
       setUsers(response.data);
@@ -18,10 +20,12 @@ function Users() {
       console.error("Erreur lors de la récupération des users", error);
     }
   };
+  
 
   // Charger les transactions d’un user spécifique
   const fetchTransactions = async (userId) => {
     try {
+
       const response = await axios.get(
         `http://localhost:5000/api/transactions/user/${userId}`
       );
@@ -36,12 +40,12 @@ function Users() {
   }, []);
 
   const handleBlock = async (id) => {
-    await axios.put(`http://localhost:5000/api/users/${id}/block`);
+    await api.put(`/users/${id}/block`);
     fetchUsers();
   };
 
   const handleUnblock = async (id) => {
-    await axios.put(`http://localhost:5000/api/users/${id}/unblock`);
+    await api.put(`/users/${id}/unblock`);
     fetchUsers();
   };
 
@@ -159,7 +163,7 @@ function Users() {
             </tbody>
           </table>
         </div>
-      ) : null}
+      ): <div>no item selected</div>}
     </div>
   );
 }
